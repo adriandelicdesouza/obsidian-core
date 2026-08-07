@@ -93,3 +93,35 @@ def test_record_id():
         "20260807T184231.123000Z-"
         "esp32-sniffer-wifi_observation"
     )
+
+def test_record_id_is_deterministic():
+    timestamp = datetime(
+        2026,
+        8,
+        7,
+        18,
+        42,
+        31,
+        123000,
+        tzinfo=timezone.utc,
+    )
+
+    first = RawRecord(
+        timestamp=timestamp,
+        source="esp32",
+        event_type="wifi",
+        identifiers={"mac": "AA:BB:CC:DD:EE:FF"},
+        metadata={"rssi": -50},
+        payload={"ssid": "example"},
+    )
+
+    second = RawRecord(
+        timestamp=timestamp,
+        source="esp32",
+        event_type="wifi",
+        identifiers={"mac": "AA:BB:CC:DD:EE:FF"},
+        metadata={"rssi": -50},
+        payload={"ssid": "example"},
+    )
+
+    assert first.record_id == second.record_id

@@ -236,3 +236,38 @@ def test_append_is_append_only(tmp_path):
     assert first.record_id in updated_content
     assert second.record_id in updated_content
     assert len(updated_content) > len(original_content)
+
+def test_read_day(tmp_path):
+    vault = Vault(tmp_path)
+    store = RawStore(vault)
+
+    record = make_record()
+
+    store.append(record)
+
+    content = store.read_day(
+        source="esp32-sniffer",
+        year=2026,
+        month=8,
+        day=7,
+    )
+
+    assert record.record_id in content
+    assert "wifi_observation" in content
+
+
+def test_read_missing_day(tmp_path):
+    vault = Vault(tmp_path)
+    store = RawStore(vault)
+
+    try:
+        store.read_day(
+            source="esp32-sniffer",
+            year=2026,
+            month=8,
+            day=7,
+        )
+    except FileNotFoundError:
+        pass
+    else:
+        raise AssertionError("Missing raw day did not raise FileNotFoundError")

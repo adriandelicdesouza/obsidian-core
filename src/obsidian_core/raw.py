@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
+import hashlib
+import json
 
 
 @dataclass(frozen=True)
@@ -23,6 +25,24 @@ class RawRecord:
 
     @property
     def record_id(self) -> str:
-        """Return a stable human-readable identifier for the record."""
-        timestamp = self.timestamp.strftime("%Y%m%dT%H%M%S.%fZ")
-        return f"{timestamp}-{self.source}-{self.event_type}"
+        """Return a deterministic identifier derived from record contents."""
+        canonical = json.dumps(
+            {
+                "timestamp": self.timestamp.isoformat(),
+                "source": self.source,
+                "event_type": self.event_type,
+                "identifiers": self.identifiers,
+                "metadata": self.metadata,
+                "payload": self.payload,
+            },
+            sort_keys=True,
+            ensure_ascii=False,
+            separators=(",", ":"),
+            default=str,
+        )
+
+        digest = hashlib.sha256(
+            canonical.encode("utf-8")
+        ).hexdigest()
+
+        return digest[:16]
