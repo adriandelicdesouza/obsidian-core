@@ -65,6 +65,7 @@ class Frontmatter:
             sort_keys=False,
             allow_unicode=True,
             default_flow_style=False,
+            indent=2,
         )
 
         return f"---\n{body}---\n"
