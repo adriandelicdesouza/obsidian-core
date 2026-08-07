@@ -62,3 +62,148 @@ def test_generated_record_id():
         "20260807T193000.000000+0000-"
         "daily-summary-1"
     )
+
+def test_generated_record_requires_timezone_aware_timestamp():
+    from datetime import datetime
+
+    try:
+        GeneratedRecord(
+            timestamp=datetime(2026, 8, 7, 19, 30),
+            generator="daily-summary",
+            generator_version="1",
+            content="Summary",
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(
+            "GeneratedRecord allowed a timezone-naive timestamp"
+        )
+
+def test_generated_record_requires_generator():
+    from datetime import datetime, timezone
+
+    try:
+        GeneratedRecord(
+            timestamp=datetime.now(timezone.utc),
+            generator="",
+            generator_version="1",
+            content="Summary",
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(
+            "GeneratedRecord allowed an empty generator"
+        )
+
+def test_generated_record_requires_generator_version():
+    from datetime import datetime, timezone
+
+    try:
+        GeneratedRecord(
+            timestamp=datetime.now(timezone.utc),
+            generator="daily-summary",
+            generator_version="",
+            content="Summary",
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(
+            "GeneratedRecord allowed an empty generator version"
+        )
+
+def test_generated_id_is_deterministic():
+    from datetime import datetime, timezone
+
+    timestamp = datetime(
+        2026,
+        8,
+        7,
+        19,
+        30,
+        tzinfo=timezone.utc,
+    )
+
+    first = GeneratedRecord(
+        timestamp=timestamp,
+        generator="daily-summary",
+        generator_version="1",
+        content="Summary A",
+    )
+
+    second = GeneratedRecord(
+        timestamp=timestamp,
+        generator="daily-summary",
+        generator_version="1",
+        content="Summary B",
+    )
+
+    assert first.generated_id == second.generated_id
+
+def test_generated_id_changes_with_generator_version():
+    from datetime import datetime, timezone
+
+    timestamp = datetime(
+        2026,
+        8,
+        7,
+        19,
+        30,
+        tzinfo=timezone.utc,
+    )
+
+    version_one = GeneratedRecord(
+        timestamp=timestamp,
+        generator="daily-summary",
+        generator_version="1",
+        content="Summary",
+    )
+
+    version_two = GeneratedRecord(
+        timestamp=timestamp,
+        generator="daily-summary",
+        generator_version="2",
+        content="Summary",
+    )
+
+    assert version_one.generated_id != version_two.generated_id
+
+def test_source_ids_are_preserved():
+    from datetime import datetime, timezone
+
+    source_ids = [
+        "20260807T184231.123000Z-esp32-sniffer-wifi_observation",
+        "20260807T184500.000000Z-esp32-sniffer-wifi_observation",
+    ]
+
+    record = GeneratedRecord(
+        timestamp=datetime.now(timezone.utc),
+        generator="daily-summary",
+        generator_version="1",
+        content="Summary",
+        source_ids=source_ids,
+    )
+
+    assert record.source_ids == source_ids
+
+def test_metadata_is_preserved():
+    from datetime import datetime, timezone
+
+    metadata = {
+        "title": "Daily Summary",
+        "status": "generated",
+        "confidence": 0.95,
+    }
+
+    record = GeneratedRecord(
+        timestamp=datetime.now(timezone.utc),
+        generator="daily-summary",
+        generator_version="1",
+        content="Summary",
+        metadata=metadata,
+    )
+
+    assert record.metadata == metadata
+
