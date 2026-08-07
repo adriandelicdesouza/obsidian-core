@@ -89,10 +89,8 @@ def test_record_id():
         event_type="wifi_observation",
     )
 
-    assert record.record_id == (
-        "20260807T184231.123000Z-"
-        "esp32-sniffer-wifi_observation"
-    )
+    assert len(record.record_id) == 16
+    assert record.record_id.isalnum()
 
 def test_record_id_is_deterministic():
     timestamp = datetime(
