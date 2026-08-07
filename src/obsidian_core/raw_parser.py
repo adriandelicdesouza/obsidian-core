@@ -76,26 +76,26 @@ class RawParser:
             "### Metadata",
         )
 
-    payload = cls._parse_payload(lines)
-    stored_record_id = cls._extract_record_id(lines)
+        payload = cls._parse_payload(lines)
+        stored_record_id = cls._extract_record_id(lines)
 
-    record = RawRecord(
-        timestamp=timestamp,
-        source=source,
-        event_type=event_type,
-        identifiers=identifiers,
-        metadata=metadata,
-        payload=payload,
-    )
-
-    if record.record_id != stored_record_id:
-        raise ValueError(
-            f"Raw record integrity check failed: "
-            f"expected {stored_record_id}, "
-            f"calculated {record.record_id}"
+        record = RawRecord(
+            timestamp=timestamp,
+            source=source,
+            event_type=event_type,
+            identifiers=identifiers,
+            metadata=metadata,
+            payload=payload,
         )
 
-    return record
+        if record.record_id != stored_record_id:
+            raise ValueError(
+                f"Raw record integrity check failed: "
+                f"expected {stored_record_id}, "
+                f"calculated {record.record_id}"
+            )
+
+        return record
 
     @staticmethod
     def _extract_source(content: str) -> str:
