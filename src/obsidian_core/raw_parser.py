@@ -76,16 +76,26 @@ class RawParser:
             "### Metadata",
         )
 
-        payload = cls._parse_payload(lines)
+    payload = cls._parse_payload(lines)
+    stored_record_id = cls._extract_record_id(lines)
 
-        return RawRecord(
-            timestamp=timestamp,
-            source=source,
-            event_type=event_type,
-            identifiers=identifiers,
-            metadata=metadata,
-            payload=payload,
+    record = RawRecord(
+        timestamp=timestamp,
+        source=source,
+        event_type=event_type,
+        identifiers=identifiers,
+        metadata=metadata,
+        payload=payload,
+    )
+
+    if record.record_id != stored_record_id:
+        raise ValueError(
+            f"Raw record integrity check failed: "
+            f"expected {stored_record_id}, "
+            f"calculated {record.record_id}"
         )
+
+    return record
 
     @staticmethod
     def _extract_source(content: str) -> str:
@@ -140,3 +150,11 @@ class RawParser:
         payload = "\n".join(lines[start:end])
 
         return json.loads(payload)
+    
+    @staticmethod
+    def _extract_record_id(lines: list[str]) -> str:
+        for line in lines:
+            if line.startswith("**Record ID:**"):
+                return line.split("`", 2)[1]
+
+        raise ValueError("Raw record ID not found")
