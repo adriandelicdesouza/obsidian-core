@@ -125,3 +125,31 @@ def test_record_id_is_deterministic():
     )
 
     assert first.record_id == second.record_id
+
+def test_record_id_changes_when_content_changes():
+    timestamp = datetime(
+        2026,
+        8,
+        7,
+        18,
+        42,
+        31,
+        123000,
+        tzinfo=timezone.utc,
+    )
+
+    first = RawRecord(
+        timestamp=timestamp,
+        source="esp32",
+        event_type="wifi",
+        metadata={"rssi": -50},
+    )
+
+    second = RawRecord(
+        timestamp=timestamp,
+        source="esp32",
+        event_type="wifi",
+        metadata={"rssi": -51},
+    )
+
+    assert first.record_id != second.record_id
