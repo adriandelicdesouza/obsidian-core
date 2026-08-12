@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from pathlib import Path
 
 from obsidian_core import GeneratedRecord, GeneratedStore, Vault
 
@@ -59,7 +60,7 @@ def test_generated_store_groups_by_day(tmp_path):
 
     path = store.append(record)
 
-    assert path.parent.name == "2026-08-07"
+    assert path.relative_to(tmp_path) == Path("Generated/2026/08/07.md")
 
 
 def test_generated_store_can_read_records(tmp_path):
