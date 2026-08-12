@@ -1,8 +1,8 @@
+import hashlib
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
-import hashlib
-import json
 
 
 @dataclass(frozen=True)
@@ -17,6 +17,9 @@ class RawRecord:
     payload: Any = None
 
     def __post_init__(self) -> None:
+        if self.timestamp.tzinfo is None or self.timestamp.utcoffset() is None:
+            raise ValueError("RawRecord timestamp must be timezone-aware")
+
         if not self.source:
             raise ValueError("RawRecord source cannot be empty")
 
