@@ -1,11 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
-
-
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any
+import hashlib
 
 
 @dataclass
@@ -46,8 +42,13 @@ class GeneratedRecord:
             "%Y%m%dT%H%M%S.%f%z"
         )
 
+        content_hash = hashlib.sha256(
+            str(self.content).encode("utf-8")
+        ).hexdigest()[:16]
+
         return (
             f"{timestamp}-"
             f"{self.generator}-"
-            f"{self.generator_version}"
+            f"{self.generator_version}-"
+            f"{content_hash}"
         )
