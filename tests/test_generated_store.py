@@ -140,3 +140,28 @@ def test_generated_store_can_read_records(tmp_path):
     assert records[0].generator_version == record.generator_version
     assert records[0].content == record.content
     assert records[0].source_ids == record.source_ids
+
+def test_generated_store_is_append_only(tmp_path):
+    vault = Vault(tmp_path)
+    store = GeneratedStore(vault)
+
+    first = make_record(
+        content="First generated record",
+    )
+
+    second = make_record(
+        content="Second generated record",
+    )
+
+    path = store.append(first)
+    original_content = path.read_text()
+
+    store.append(second)
+
+    updated_content = path.read_text()
+
+    assert first.generated_id in updated_content
+    assert second.generated_id in updated_content
+    assert "First generated record" in updated_content
+    assert "Second generated record" in updated_content
+    assert len(updated_content) > len(original_content)
