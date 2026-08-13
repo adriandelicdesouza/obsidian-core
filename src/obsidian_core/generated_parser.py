@@ -139,13 +139,20 @@ class GeneratedParser:
             if line.startswith("### "):
                 break
 
-            if line.startswith("- **") and ":**" in line:
-                key, value = line[4:].split(":**", 1)
-                value = value.strip().strip("`")
-                values[key] = yaml.safe_load(value)
+            if not line.strip():
+                continue
 
-            elif line.strip() == "_None_":
+            if line.strip() == "_None_":
                 return {}
+
+            if not line.startswith("- **") or ":**" not in line:
+                raise ValueError(
+                    "Generated record integrity check failed: malformed metadata"
+                )
+
+            key, value = line[4:].split(":**", 1)
+            value = value.strip().strip("`")
+            values[key] = yaml.safe_load(value)
 
         return values
 

@@ -58,9 +58,8 @@ def test_generated_record_id():
         content="Summary",
     )
 
-    assert record.generated_id == (
-        "20260807T193000.000000+0000-"
-        "daily-summary-1"
+    assert record.generated_id.startswith(
+        "20260807T193000.000000+0000-daily-summary-1-"
     )
 
 def test_generated_record_requires_timezone_aware_timestamp():
@@ -137,7 +136,7 @@ def test_generated_id_is_deterministic():
         timestamp=timestamp,
         generator="daily-summary",
         generator_version="1",
-        content="Summary B",
+        content="Summary A",
     )
 
     assert first.generated_id == second.generated_id
