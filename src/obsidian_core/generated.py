@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 
@@ -42,7 +42,7 @@ class GeneratedRecord:
     def generated_id(self) -> str:
         """Return a deterministic identifier for this generated record."""
 
-        timestamp = self.timestamp.astimezone().strftime(
+        timestamp = self.timestamp.astimezone(timezone.utc).strftime(
             "%Y%m%dT%H%M%S.%f%z"
         )
 

@@ -207,3 +207,35 @@ def test_metadata_is_preserved():
 
     assert record.metadata == metadata
 
+def test_generated_id_is_timezone_independent():
+    from datetime import datetime, timedelta, timezone
+
+    utc_record = GeneratedRecord(
+        timestamp=datetime(
+            2026,
+            8,
+            7,
+            19,
+            30,
+            tzinfo=timezone.utc,
+        ),
+        generator="daily-summary",
+        generator_version="1",
+        content="Summary",
+    )
+
+    eastern_record = GeneratedRecord(
+        timestamp=datetime(
+            2026,
+            8,
+            7,
+            15,
+            30,
+            tzinfo=timezone(timedelta(hours=-4)),
+        ),
+        generator="daily-summary",
+        generator_version="1",
+        content="Summary",
+    )
+
+    assert utc_record.generated_id == eastern_record.generated_id
