@@ -196,3 +196,115 @@ def test_generated_parser_rejects_malformed_timestamp(tmp_path):
         ValueError,
     ):
         GeneratedParser.parse(modified)
+
+def test_generated_parser_rejects_malformed_header(tmp_path):
+    record = make_record()
+
+    path, content = render_record(tmp_path, record)
+
+    modified = content.replace(
+        "## 2026-08-07T19:30:00+00:00 — daily-summary",
+        "invalid header",
+    )
+
+    with pytest.raises(ValueError):
+        GeneratedParser.parse(modified)
+
+def test_generated_parser_rejects_missing_source_section(tmp_path):
+    record = make_record()
+
+    path, content = render_record(tmp_path, record)
+
+    modified = content.replace(
+        "### Source Records",
+        "### Invalid Source Records",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Source records section not found",
+    ):
+        GeneratedParser.parse(modified)
+
+
+def test_generated_parser_rejects_missing_metadata_section(tmp_path):
+    record = make_record()
+
+    path, content = render_record(tmp_path, record)
+
+    modified = content.replace(
+        "### Metadata",
+        "### Invalid Metadata",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Metadata section not found",
+    ):
+        GeneratedParser.parse(modified)
+
+
+def test_generated_parser_rejects_missing_content_section(tmp_path):
+    record = make_record()
+
+    path, content = render_record(tmp_path, record)
+
+    modified = content.replace(
+        "### Content",
+        "### Invalid Content",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Content section not found",
+    ):
+        GeneratedParser.parse(modified)
+
+def test_generated_parser_rejects_malformed_generated_id(tmp_path):
+    record = make_record()
+
+    path, content = render_record(tmp_path, record)
+
+    modified = content.replace(
+        f"**Generated ID:** `{record.generated_id}`",
+        "**Generated ID:** `not-a-valid-generated-id`",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="integrity check failed",
+    ):
+        GeneratedParser.parse(modified)
+
+def test_generated_parser_rejects_missing_generator_version(tmp_path):
+    record = make_record()
+
+    path, content = render_record(tmp_path, record)
+
+    modified = content.replace(
+        "**Generator Version:** `1`\n\n",
+        "",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Generated record field not found",
+    ):
+        GeneratedParser.parse(modified)
+
+def test_generated_parser_rejects_malformed_source_records(tmp_path):
+    record = make_record()
+
+    path, content = render_record(tmp_path, record)
+
+    modified = content.replace(
+        f"- `{record.source_ids[0]}`",
+        "- malformed source record",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Malformed source records section",
+    ):
+        GeneratedParser.parse(modified)
+
