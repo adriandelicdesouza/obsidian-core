@@ -18,6 +18,9 @@ class GeneratedParser:
         """Parse all generated records contained in a daily log."""
         matches = list(cls.RECORD_PATTERN.finditer(content))
 
+        if not matches:
+            raise ValueError("Invalid generated record header")
+
         records = []
 
         for index, match in enumerate(matches):
@@ -118,11 +121,17 @@ class GeneratedParser:
             if line.startswith("### "):
                 break
 
+            if not line.strip():
+                continue
+
             if line.startswith("- `") and line.endswith("`"):
                 values.append(line[3:-1])
 
             elif line.strip() == "_None_":
                 return []
+
+            else:
+                raise ValueError("Malformed source records section")
 
         return values
 
