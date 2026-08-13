@@ -1,6 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 
+from .raw_parser import RawParser
 from .raw import RawRecord
 from .vault import Vault
 
@@ -80,8 +81,8 @@ class RawStore:
         year: int,
         month: int,
         day: int,
-    ) -> str:
-        """Read the raw Markdown log for a specific day."""
+    ) -> list[RawRecord]:
+        """Read and parse raw records for a specific day."""
         path = (
             self.root
             / source
@@ -95,7 +96,7 @@ class RawStore:
         if not note.exists:
             raise FileNotFoundError(path)
 
-        return note.read()
+        return RawParser.parse(note.read())
 
     def day_path(self, source: str, timestamp: datetime) -> Path:
         """Return the raw log path for a source and timestamp."""

@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 import json
+import pytest
 
 from obsidian_core import RawRecord, RawStore, Vault
 
@@ -237,7 +238,7 @@ def test_append_is_append_only(tmp_path):
     assert second.record_id in updated_content
     assert len(updated_content) > len(original_content)
 
-def test_read_day(tmp_path):
+def test_read_day_returns_parsed_records(tmp_path):
     vault = Vault(tmp_path)
     store = RawStore(vault)
 
@@ -245,16 +246,72 @@ def test_read_day(tmp_path):
 
     store.append(record)
 
-    content = store.read_day(
+    records = store.read_day(
         source="esp32-sniffer",
         year=2026,
         month=8,
         day=7,
     )
 
-    assert record.record_id in content
-    assert "wifi_observation" in content
+    assert isinstance(records, list)
+    assert len(records) == 1
+    assert isinstance(records[0], RawRecord)
 
+    assert records[0].record_id == record.record_id
+    assert records[0].timestamp == record.timestamp
+    assert records[0].source == record.source
+    assert records[0].event_type == record.event_type
+    assert records[0].identifiers == record.identifiers
+    assert records[0].metadata == record.metadata
+    assert records[0].payload == record.payload
+
+def test_read_day_round_trip_multiple_records(tmp_path):
+    vault = Vault(tmp_path)
+    store = RawStore(vault)
+
+    records = [
+        make_record(event_type="event_one"),
+        make_record(event_type="event_two"),
+        make_record(event_type="event_three"),
+    ]
+
+    store.append_many(records)
+
+    loaded = store.read_day(
+        source="esp32-sniffer",
+        year=2026,
+        month=8,
+        day=7,
+    )
+
+    assert [record.record_id for record in loaded] == [
+        record.record_id for record in records
+    ]
+
+def test_read_day_rejects_modified_record(tmp_path):
+    vault = Vault(tmp_path)
+    store = RawStore(vault)
+
+    record = make_record()
+
+    path = store.append(record)
+
+    content = path.read_text()
+
+    modified = content.replace(
+        "**rssi:** `-54`",
+        "**rssi:** `-20`",
+    )
+
+    path.write_text(modified)
+
+    with pytest.raises(ValueError, match="integrity check failed"):
+        store.read_day(
+            source="esp32-sniffer",
+            year=2026,
+            month=8,
+            day=7,
+        )
 
 def test_read_missing_day(tmp_path):
     vault = Vault(tmp_path)
