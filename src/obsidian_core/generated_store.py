@@ -33,6 +33,18 @@ class GeneratedStore:
 
         return note.path
 
+    def append_many(
+        self,
+        records: list[GeneratedRecord],
+    ) -> list[Path]:
+        """Append multiple generated records."""
+        paths = []
+
+        for record in records:
+            paths.append(self.append(record))
+
+        return paths
+
     def day_path(self, timestamp: date) -> Path:
         """Return the generated log path for a date."""
 
