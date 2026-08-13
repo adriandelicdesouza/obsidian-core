@@ -31,6 +31,23 @@ class Note:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.path.write_text(content, encoding="utf-8")
 
+    def append(self, content: str) -> None:
+        """Append content without overwriting existing note contents."""
+        if not self.exists:
+            self.write(content)
+            return
+
+        existing = self.read()
+
+        if not existing:
+            self.write(content)
+            return
+
+        if existing.endswith("\n"):
+            self.write(existing + content)
+        else:
+            self.write(existing + "\n\n" + content)
+
     @property
     def properties(self) -> Frontmatter:
         """Return the note's parsed properties."""
