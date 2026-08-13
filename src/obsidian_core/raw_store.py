@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from .raw_parser import RawParser
@@ -28,18 +28,9 @@ class RawStore:
 
         return note.path
 
-    def day_path(self, source: str, timestamp: datetime) -> Path:
-        """Return the raw log path for a source and timestamp."""
-        return (
-            self.root
-            / source
-            / f"{timestamp.year:04d}"
-            / f"{timestamp.month:02d}"
-            / f"{timestamp.day:02d}.md"
-        )
 
     def _path_for(self, record: RawRecord) -> Path:
-        return self.day_path(record.source, record.timestamp)
+        return self.day_path(record.source, record.timestamp.date())
 
     def _render_daily_file(self, record: RawRecord) -> str:
         return (
@@ -78,18 +69,10 @@ class RawStore:
     def read_day(
         self,
         source: str,
-        year: int,
-        month: int,
-        day: int,
+        timestamp: date,
     ) -> list[RawRecord]:
         """Read and parse raw records for a specific day."""
-        path = (
-            self.root
-            / source
-            / f"{year:04d}"
-            / f"{month:02d}"
-            / f"{day:02d}.md"
-        )
+        path = self.day_path(source, timestamp)
 
         note = self.vault.note(str(path))
 

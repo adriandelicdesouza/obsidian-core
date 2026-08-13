@@ -1,5 +1,7 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 import json
+from pathlib import Path
+
 import pytest
 
 from obsidian_core import RawRecord, RawStore, Vault
@@ -198,6 +200,7 @@ def test_record_identifier_is_stored(tmp_path):
 
     assert record.record_id in content
 
+
 def test_append_many(tmp_path):
     vault = Vault(tmp_path)
     store = RawStore(vault)
@@ -219,6 +222,7 @@ def test_append_many(tmp_path):
     assert "event_two" in content
     assert "event_three" in content
 
+
 def test_append_is_append_only(tmp_path):
     vault = Vault(tmp_path)
     store = RawStore(vault)
@@ -238,6 +242,7 @@ def test_append_is_append_only(tmp_path):
     assert second.record_id in updated_content
     assert len(updated_content) > len(original_content)
 
+
 def test_read_day_returns_parsed_records(tmp_path):
     vault = Vault(tmp_path)
     store = RawStore(vault)
@@ -248,9 +253,7 @@ def test_read_day_returns_parsed_records(tmp_path):
 
     records = store.read_day(
         source="esp32-sniffer",
-        year=2026,
-        month=8,
-        day=7,
+        timestamp=date(2026, 8, 7),
     )
 
     assert isinstance(records, list)
@@ -264,6 +267,7 @@ def test_read_day_returns_parsed_records(tmp_path):
     assert records[0].identifiers == record.identifiers
     assert records[0].metadata == record.metadata
     assert records[0].payload == record.payload
+
 
 def test_read_day_round_trip_multiple_records(tmp_path):
     vault = Vault(tmp_path)
@@ -279,14 +283,13 @@ def test_read_day_round_trip_multiple_records(tmp_path):
 
     loaded = store.read_day(
         source="esp32-sniffer",
-        year=2026,
-        month=8,
-        day=7,
+        timestamp=date(2026, 8, 7),
     )
 
     assert [record.record_id for record in loaded] == [
         record.record_id for record in records
     ]
+
 
 def test_read_day_rejects_modified_record(tmp_path):
     vault = Vault(tmp_path)
@@ -308,23 +311,34 @@ def test_read_day_rejects_modified_record(tmp_path):
     with pytest.raises(ValueError, match="integrity check failed"):
         store.read_day(
             source="esp32-sniffer",
-            year=2026,
-            month=8,
-            day=7,
+            timestamp=date(2026, 8, 7),
         )
+
 
 def test_read_missing_day(tmp_path):
     vault = Vault(tmp_path)
     store = RawStore(vault)
 
-    try:
+    with pytest.raises(FileNotFoundError):
         store.read_day(
             source="esp32-sniffer",
-            year=2026,
-            month=8,
-            day=7,
+            timestamp=date(2026, 8, 7),
         )
-    except FileNotFoundError:
-        pass
-    else:
-        raise AssertionError("Missing raw day did not raise FileNotFoundError")
+
+
+def test_day_path_uses_date(tmp_path):
+    vault = Vault(tmp_path)
+    store = RawStore(vault)
+
+    path = store.day_path(
+        source="esp32-sniffer",
+        timestamp=date(2026, 8, 7),
+    )
+
+    assert path == (
+        Path("Raw")
+        / "esp32-sniffer"
+        / "2026"
+        / "08"
+        / "07.md"
+    )
