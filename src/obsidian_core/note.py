@@ -99,7 +99,10 @@ class Note:
         return Frontmatter.parse(self.read())
 
     def set_property(self, key: str, value: object) -> None:
-        """Set a property while preserving the note body."""
+        """Set a property while preserving semantic frontmatter and body.
+
+        Frontmatter formatting may be normalized during serialization.
+        """
         content = self.read()
         frontmatter = Frontmatter.parse(content)
 
@@ -108,7 +111,10 @@ class Note:
         self.write(_replace_frontmatter(content, frontmatter))
 
     def delete_property(self, key: str) -> None:
-        """Delete a property while preserving the note body."""
+        """Delete a property while preserving semantic frontmatter and body.
+
+        Frontmatter formatting may be normalized during serialization.
+        """
         content = self.read()
         frontmatter = Frontmatter.parse(content)
 
