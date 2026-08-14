@@ -91,3 +91,58 @@ Do not modify this.
     assert "title: Test" in content
     assert "# Human Knowledge\n" in content
     assert "Do not modify this." in content
+
+def test_property_modification_preserves_frontmatter_semantics(tmp_path):
+    vault = Vault(tmp_path)
+    note = vault.note("Test.md")
+
+    note.write(
+        """---
+title: "Original"
+tags:
+  - test
+  - example
+---
+
+# Human Knowledge
+
+This content must remain untouched.
+"""
+    )
+
+    note.set_property("title", "Updated")
+
+    properties = note.properties
+
+    assert properties.get("title") == "Updated"
+    assert properties.get("tags") == ["test", "example"]
+
+    assert "# Human Knowledge" in note.read()
+    assert "This content must remain untouched." in note.read()
+
+def test_delete_property_preserves_frontmatter_semantics(tmp_path):
+    vault = Vault(tmp_path)
+    note = vault.note("Test.md")
+
+    note.write(
+        """---
+title: Test
+tags:
+  - one
+  - two
+draft: true
+---
+
+# Human Knowledge
+"""
+    )
+
+    note.delete_property("draft")
+
+    properties = note.properties
+
+    assert properties.get("title") == "Test"
+    assert properties.get("tags") == ["one", "two"]
+    assert not properties.has("draft")
+
+    assert "# Human Knowledge" in note.read()
