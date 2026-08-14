@@ -1,4 +1,3 @@
-from obsidian_core.links import WikiLink, parse_wiki_links
 import pytest
 
 from obsidian_core.links import (
@@ -6,6 +5,7 @@ from obsidian_core.links import (
     create_wiki_link,
     parse_wiki_links,
 )
+
 
 def test_parse_simple_wiki_link():
     assert parse_wiki_links("[[Linux Homeserver]]") == [
@@ -67,6 +67,7 @@ def test_parse_multiple_wiki_links():
 
 def test_parse_content_without_wiki_links():
     assert parse_wiki_links("# No links here") == []
+
 
 def test_create_simple_wiki_link():
     assert create_wiki_link("ESP32") == "[[ESP32]]"
