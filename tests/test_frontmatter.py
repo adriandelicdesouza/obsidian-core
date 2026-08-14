@@ -1,5 +1,5 @@
 from obsidian_core.frontmatter import Frontmatter
-
+import pytest
 
 def test_parse_properties():
     content = """---
@@ -81,3 +81,53 @@ def test_serialize_properties():
     assert "- one" in result
     assert "- two" in result
     assert result.endswith("---\n")
+
+
+def test_invalid_yaml():
+    content = """---
+title: [invalid
+---
+"""
+
+    with pytest.raises(ValueError, match="Invalid frontmatter YAML"):
+        Frontmatter.parse(content)
+
+
+def test_missing_closing_delimiter():
+    content = """---
+title: Test
+"""
+
+    with pytest.raises(
+        ValueError,
+        match="Frontmatter closing delimiter not found",
+    ):
+        Frontmatter.parse(content)
+
+
+def test_non_dictionary_yaml():
+    content = """---
+- one
+- two
+---
+"""
+
+    with pytest.raises(
+        ValueError,
+        match="must contain a mapping",
+    ):
+        Frontmatter.parse(content)
+
+
+def test_duplicate_properties():
+    content = """---
+title: First
+title: Second
+---
+"""
+
+    with pytest.raises(
+        ValueError,
+        match="Duplicate frontmatter property",
+    ):
+        Frontmatter.parse(content)
