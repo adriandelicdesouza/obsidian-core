@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .frontmatter import Frontmatter
+from .generated import GeneratedRecord
 
 if TYPE_CHECKING:
     from .vault import Vault
@@ -47,6 +48,32 @@ class Note:
             self.write(existing + content)
         else:
             self.write(existing + "\n\n" + content)
+
+    def append_generated(self, record: GeneratedRecord) -> None:
+        """Append a generated record while preserving existing note content."""
+        generated = (
+            "<!-- obsidian-core:generated -->\n"
+            f"## Generated: {record.generator}\n\n"
+            f"**Generated ID:** `{record.generated_id}`\n\n"
+            f"**Generator:** `{record.generator}`\n\n"
+            f"**Generator Version:** `{record.generator_version}`\n\n"
+            f"{record.content}\n"
+            "<!-- obsidian-core:generated-end -->\n"
+        )
+
+        if not self.exists:
+            self.write(generated)
+            return
+
+        existing = self.read()
+
+        if not existing:
+            self.write(generated)
+            return
+
+        separator = "\n" if existing.endswith("\n") else "\n\n"
+
+        self.write(existing + separator + generated)
 
     @property
     def properties(self) -> Frontmatter:
