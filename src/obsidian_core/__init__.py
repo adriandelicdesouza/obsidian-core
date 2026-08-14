@@ -6,6 +6,7 @@ from .raw_parser import RawParser
 from .generated import GeneratedRecord
 from .generated_store import GeneratedStore
 from .generated_parser import GeneratedParser
+from .links import WikiLink, parse_wiki_links
 
 __all__ = [
     "Note",
@@ -16,4 +17,6 @@ __all__ = [
     "GeneratedRecord",
     "GeneratedStore",
     "GeneratedParser",
+    "WikiLink",
+    "parse_wiki_links",
 ]
