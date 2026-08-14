@@ -32,6 +32,24 @@ class Note:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.path.write_text(content, encoding="utf-8")
 
+    def delete(self) -> None:
+        """Safely delete this note from the vault."""
+        vault_path = self.vault.path.resolve()
+        note_path = self.path.resolve()
+
+        try:
+            note_path.relative_to(vault_path)
+        except ValueError:
+            raise ValueError("Cannot delete a note outside the vault")
+
+        if not note_path.exists():
+            raise FileNotFoundError(note_path)
+
+        if not note_path.is_file():
+            raise ValueError("Cannot delete a non-file path")
+
+        note_path.unlink()
+
     def append(self, content: str) -> None:
         """Append content without overwriting existing note contents."""
         if not self.exists:

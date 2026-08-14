@@ -1,4 +1,5 @@
 from pathlib import Path
+import pytest
 
 from obsidian_core import Note, Vault
 
@@ -88,3 +89,55 @@ def test_append_does_not_overwrite_existing_content(tmp_path):
     assert "First record" in content
     assert "Second record" in content
     assert len(content) > len("First record")
+
+def test_delete_existing_note(tmp_path):
+    note = make_note(tmp_path)
+
+    note.write("Content")
+    assert note.exists
+
+    note.delete()
+
+    assert not note.exists
+
+
+def test_delete_nonexistent_note(tmp_path):
+    note = make_note(tmp_path)
+
+    with pytest.raises(FileNotFoundError):
+        note.delete()
+
+
+def test_delete_nested_note(tmp_path):
+    note = make_note(tmp_path, "nested/deep/test.md")
+
+    note.write("Content")
+    note.delete()
+
+    assert not note.path.exists()
+
+
+def test_delete_rejects_path_traversal(tmp_path):
+    note = make_note(tmp_path, "../outside.md")
+
+    outside = tmp_path.parent / "outside.md"
+    outside.write_text("Do not delete")
+
+    with pytest.raises(ValueError):
+        note.delete()
+
+    assert outside.exists()
+
+
+def test_delete_protects_files_outside_vault(tmp_path):
+    vault = Vault(tmp_path)
+
+    outside = tmp_path.parent / "outside.md"
+    outside.write_text("Do not delete")
+
+    note = Note(outside, vault)
+
+    with pytest.raises(ValueError):
+        note.delete()
+
+    assert outside.exists()
