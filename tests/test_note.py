@@ -1,4 +1,3 @@
-from pathlib import Path
 import pytest
 
 from obsidian_core import Note, Vault
@@ -29,24 +28,13 @@ def test_append_preserves_existing_markdown(tmp_path):
 def test_append_preserves_frontmatter(tmp_path):
     note = make_note(tmp_path)
 
-    note.write(
-        "---\n"
-        "title: Test\n"
-        "type: note\n"
-        "---\n\n"
-        "# Existing\n"
-    )
+    note.write("---\ntitle: Test\ntype: note\n---\n\n# Existing\n")
 
     note.append("## Appended")
 
     content = note.read()
 
-    assert content.startswith(
-        "---\n"
-        "title: Test\n"
-        "type: note\n"
-        "---\n"
-    )
+    assert content.startswith("---\ntitle: Test\ntype: note\n---\n")
     assert "# Existing" in content
     assert "## Appended" in content
 
@@ -89,6 +77,7 @@ def test_append_does_not_overwrite_existing_content(tmp_path):
     assert "First record" in content
     assert "Second record" in content
     assert len(content) > len("First record")
+
 
 def test_delete_existing_note(tmp_path):
     note = make_note(tmp_path)

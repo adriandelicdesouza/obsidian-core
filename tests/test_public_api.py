@@ -1,6 +1,5 @@
 import obsidian_core
 
-
 EXPECTED_PUBLIC_API = {
     "Note",
     "Vault",

@@ -1,6 +1,9 @@
-from datetime import datetime, timezone
-from obsidian_core import RawParser, RawRecord, RawStore, Vault
+from datetime import UTC, datetime
+
 import pytest
+
+from obsidian_core import RawParser, RawRecord, RawStore, Vault
+
 
 def test_parser_recovers_record(tmp_path):
     vault = Vault(tmp_path)
@@ -15,7 +18,7 @@ def test_parser_recovers_record(tmp_path):
             42,
             31,
             123000,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         ),
         source="esp32-sniffer",
         event_type="wifi_observation",
@@ -49,6 +52,7 @@ def test_parser_recovers_record(tmp_path):
     assert record.metadata == original.metadata
     assert record.payload == original.payload
 
+
 def test_parser_rejects_modified_record(tmp_path):
     vault = Vault(tmp_path)
     store = RawStore(vault)
@@ -62,7 +66,7 @@ def test_parser_rejects_modified_record(tmp_path):
             42,
             31,
             123000,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         ),
         source="esp32-sniffer",
         event_type="wifi_observation",

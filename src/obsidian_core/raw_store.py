@@ -1,8 +1,8 @@
 from datetime import date, datetime
 from pathlib import Path
 
-from .raw_parser import RawParser
 from .raw import RawRecord
+from .raw_parser import RawParser
 from .vault import Vault
 
 
@@ -28,7 +28,6 @@ class RawStore:
 
         return note.path
 
-
     def _path_for(self, record: RawRecord) -> Path:
         return self.day_path(record.source, record.timestamp.date())
 
@@ -38,8 +37,7 @@ class RawStore:
             "type: raw-log\n"
             f"source: {record.source}\n"
             f"date: {record.timestamp.date()}\n"
-            "---\n\n"
-            + self._render(record)
+            "---\n\n" + self._render(record)
         )
 
     def _render(self, record: RawRecord) -> str:
@@ -91,16 +89,12 @@ class RawStore:
             / f"{timestamp.day:02d}.md"
         )
 
-
     @staticmethod
     def _render_mapping(mapping: dict) -> str:
         if not mapping:
             return "_None_"
 
-        return "\n".join(
-            f"- **{key}:** `{value}`"
-            for key, value in mapping.items()
-        )
+        return "\n".join(f"- **{key}:** `{value}`" for key, value in mapping.items())
 
     @staticmethod
     def _render_payload(payload) -> str:

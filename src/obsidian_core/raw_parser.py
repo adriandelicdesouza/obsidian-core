@@ -1,7 +1,9 @@
-from datetime import datetime
 import json
 import re
+from datetime import datetime
+
 import yaml
+
 from .raw import RawRecord
 
 
@@ -24,11 +26,7 @@ class RawParser:
 
         for index, match in enumerate(matches):
             start = match.start()
-            end = (
-                matches[index + 1].start()
-                if index + 1 < len(matches)
-                else len(content)
-            )
+            end = matches[index + 1].start() if index + 1 < len(matches) else len(content)
 
             block = content[start:end]
 
@@ -60,9 +58,7 @@ class RawParser:
         if not match:
             raise ValueError("Invalid raw record header")
 
-        timestamp = datetime.fromisoformat(
-            match.group("timestamp")
-        )
+        timestamp = datetime.fromisoformat(match.group("timestamp"))
 
         event_type = match.group("event_type")
 
@@ -150,7 +146,7 @@ class RawParser:
         payload = "\n".join(lines[start:end])
 
         return json.loads(payload)
-    
+
     @staticmethod
     def _extract_record_id(lines: list[str]) -> str:
         for line in lines:

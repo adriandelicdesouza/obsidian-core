@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -13,7 +13,7 @@ def make_record(**kwargs):
             7,
             19,
             30,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         ),
         "generator": "daily-summary",
         "generator_version": "1",
@@ -46,7 +46,7 @@ def render_record(tmp_path, record=None):
 def test_generated_parser_round_trip(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     records = GeneratedParser.parse(content)
 
@@ -66,7 +66,7 @@ def test_generated_parser_round_trip(tmp_path):
 def test_generated_parser_rejects_modified_content(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "Generated summary",
@@ -83,7 +83,7 @@ def test_generated_parser_rejects_modified_content(tmp_path):
 def test_generated_parser_rejects_modified_generator(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "## 2026-08-07T19:30:00+00:00 — daily-summary",
@@ -100,7 +100,7 @@ def test_generated_parser_rejects_modified_generator(tmp_path):
 def test_generated_parser_rejects_modified_generator_version(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "**Generator Version:** `1`",
@@ -117,7 +117,7 @@ def test_generated_parser_rejects_modified_generator_version(tmp_path):
 def test_generated_parser_rejects_modified_timestamp(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "## 2026-08-07T19:30:00+00:00 — daily-summary",
@@ -134,7 +134,7 @@ def test_generated_parser_rejects_modified_timestamp(tmp_path):
 def test_generated_parser_rejects_missing_generated_id(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         f"**Generated ID:** `{record.generated_id}`\n\n",
@@ -151,7 +151,7 @@ def test_generated_parser_rejects_missing_generated_id(tmp_path):
 def test_generated_parser_rejects_malformed_metadata(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "- **status:** `generated`",
@@ -168,7 +168,7 @@ def test_generated_parser_rejects_malformed_metadata(tmp_path):
 def test_generated_parser_rejects_malformed_source_section(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "### Source Records",
@@ -185,7 +185,7 @@ def test_generated_parser_rejects_malformed_source_section(tmp_path):
 def test_generated_parser_rejects_malformed_timestamp(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "## 2026-08-07T19:30:00+00:00 — daily-summary",
@@ -197,10 +197,11 @@ def test_generated_parser_rejects_malformed_timestamp(tmp_path):
     ):
         GeneratedParser.parse(modified)
 
+
 def test_generated_parser_rejects_malformed_header(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "## 2026-08-07T19:30:00+00:00 — daily-summary",
@@ -210,10 +211,11 @@ def test_generated_parser_rejects_malformed_header(tmp_path):
     with pytest.raises(ValueError):
         GeneratedParser.parse(modified)
 
+
 def test_generated_parser_rejects_missing_source_section(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "### Source Records",
@@ -230,7 +232,7 @@ def test_generated_parser_rejects_missing_source_section(tmp_path):
 def test_generated_parser_rejects_missing_metadata_section(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "### Metadata",
@@ -247,7 +249,7 @@ def test_generated_parser_rejects_missing_metadata_section(tmp_path):
 def test_generated_parser_rejects_missing_content_section(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "### Content",
@@ -260,10 +262,11 @@ def test_generated_parser_rejects_missing_content_section(tmp_path):
     ):
         GeneratedParser.parse(modified)
 
+
 def test_generated_parser_rejects_malformed_generated_id(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         f"**Generated ID:** `{record.generated_id}`",
@@ -276,10 +279,11 @@ def test_generated_parser_rejects_malformed_generated_id(tmp_path):
     ):
         GeneratedParser.parse(modified)
 
+
 def test_generated_parser_rejects_missing_generator_version(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         "**Generator Version:** `1`\n\n",
@@ -292,10 +296,11 @@ def test_generated_parser_rejects_missing_generator_version(tmp_path):
     ):
         GeneratedParser.parse(modified)
 
+
 def test_generated_parser_rejects_malformed_source_records(tmp_path):
     record = make_record()
 
-    path, content = render_record(tmp_path, record)
+    _, content = render_record(tmp_path, record)
 
     modified = content.replace(
         f"- `{record.source_ids[0]}`",
@@ -307,4 +312,3 @@ def test_generated_parser_rejects_malformed_source_records(tmp_path):
         match="Malformed source records section",
     ):
         GeneratedParser.parse(modified)
-

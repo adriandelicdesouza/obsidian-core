@@ -78,10 +78,7 @@ def test_create_nested_wiki_link():
 
 
 def test_create_wiki_link_with_alias():
-    assert (
-        create_wiki_link("ESP32", "Living Room Sensor")
-        == "[[ESP32|Living Room Sensor]]"
-    )
+    assert create_wiki_link("ESP32", "Living Room Sensor") == "[[ESP32|Living Room Sensor]]"
 
 
 def test_create_wiki_link_rejects_empty_target():

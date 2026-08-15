@@ -92,6 +92,7 @@ Do not modify this.
     assert "# Human Knowledge\n" in content
     assert "Do not modify this." in content
 
+
 def test_property_modification_preserves_frontmatter_semantics(tmp_path):
     vault = Vault(tmp_path)
     note = vault.note("Test.md")
@@ -119,6 +120,7 @@ This content must remain untouched.
 
     assert "# Human Knowledge" in note.read()
     assert "This content must remain untouched." in note.read()
+
 
 def test_delete_property_preserves_frontmatter_semantics(tmp_path):
     vault = Vault(tmp_path)

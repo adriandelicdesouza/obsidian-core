@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 
 from obsidian_core import GeneratedRecord
 
@@ -12,7 +12,7 @@ def test_generated_record():
             19,
             30,
             0,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         ),
         generator="daily-summary",
         generator_version="1",
@@ -28,7 +28,7 @@ def test_generated_record():
 
 def test_generated_record_preserves_sources():
     record = GeneratedRecord(
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(UTC),
         generator="daily-summary",
         generator_version="1",
         content="Summary",
@@ -48,7 +48,7 @@ def test_generated_record_id():
         19,
         30,
         0,
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
 
     record = GeneratedRecord(
@@ -58,16 +58,15 @@ def test_generated_record_id():
         content="Summary",
     )
 
-    assert record.generated_id.startswith(
-        "20260807T193000.000000+0000-daily-summary-1-"
-    )
+    assert record.generated_id.startswith("20260807T193000.000000+0000-daily-summary-1-")
+
 
 def test_generated_record_requires_timezone_aware_timestamp():
     from datetime import datetime
 
     try:
         GeneratedRecord(
-            timestamp=datetime(2026, 8, 7, 19, 30),
+            timestamp=datetime(2026, 8, 7, 19, 30),  # noqa: DTZ001
             generator="daily-summary",
             generator_version="1",
             content="Summary",
@@ -75,16 +74,15 @@ def test_generated_record_requires_timezone_aware_timestamp():
     except ValueError:
         pass
     else:
-        raise AssertionError(
-            "GeneratedRecord allowed a timezone-naive timestamp"
-        )
+        raise AssertionError("GeneratedRecord allowed a timezone-naive timestamp")
+
 
 def test_generated_record_requires_generator():
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     try:
         GeneratedRecord(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             generator="",
             generator_version="1",
             content="Summary",
@@ -92,16 +90,15 @@ def test_generated_record_requires_generator():
     except ValueError:
         pass
     else:
-        raise AssertionError(
-            "GeneratedRecord allowed an empty generator"
-        )
+        raise AssertionError("GeneratedRecord allowed an empty generator")
+
 
 def test_generated_record_requires_generator_version():
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     try:
         GeneratedRecord(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             generator="daily-summary",
             generator_version="",
             content="Summary",
@@ -109,12 +106,11 @@ def test_generated_record_requires_generator_version():
     except ValueError:
         pass
     else:
-        raise AssertionError(
-            "GeneratedRecord allowed an empty generator version"
-        )
+        raise AssertionError("GeneratedRecord allowed an empty generator version")
+
 
 def test_generated_id_is_deterministic():
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     timestamp = datetime(
         2026,
@@ -122,7 +118,7 @@ def test_generated_id_is_deterministic():
         7,
         19,
         30,
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
 
     first = GeneratedRecord(
@@ -141,8 +137,9 @@ def test_generated_id_is_deterministic():
 
     assert first.generated_id == second.generated_id
 
+
 def test_generated_id_changes_with_generator_version():
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     timestamp = datetime(
         2026,
@@ -150,7 +147,7 @@ def test_generated_id_changes_with_generator_version():
         7,
         19,
         30,
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
 
     version_one = GeneratedRecord(
@@ -169,8 +166,9 @@ def test_generated_id_changes_with_generator_version():
 
     assert version_one.generated_id != version_two.generated_id
 
+
 def test_source_ids_are_preserved():
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     source_ids = [
         "20260807T184231.123000Z-esp32-sniffer-wifi_observation",
@@ -178,7 +176,7 @@ def test_source_ids_are_preserved():
     ]
 
     record = GeneratedRecord(
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(UTC),
         generator="daily-summary",
         generator_version="1",
         content="Summary",
@@ -187,8 +185,9 @@ def test_source_ids_are_preserved():
 
     assert record.source_ids == source_ids
 
+
 def test_metadata_is_preserved():
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     metadata = {
         "title": "Daily Summary",
@@ -197,7 +196,7 @@ def test_metadata_is_preserved():
     }
 
     record = GeneratedRecord(
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(UTC),
         generator="daily-summary",
         generator_version="1",
         content="Summary",
@@ -206,8 +205,9 @@ def test_metadata_is_preserved():
 
     assert record.metadata == metadata
 
+
 def test_generated_id_is_timezone_independent():
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
 
     utc_record = GeneratedRecord(
         timestamp=datetime(
@@ -216,7 +216,7 @@ def test_generated_id_is_timezone_independent():
             7,
             19,
             30,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         ),
         generator="daily-summary",
         generator_version="1",
