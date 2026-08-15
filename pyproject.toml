@@ -31,6 +31,7 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--cov=obsidian_core --cov-report=term-missing --cov-report=html"
 
 [tool.ruff]
 line-length = 100
