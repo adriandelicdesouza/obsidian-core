@@ -165,3 +165,24 @@ def test_generated_store_is_append_only(tmp_path):
     assert "First generated record" in updated_content
     assert "Second generated record" in updated_content
     assert len(updated_content) > len(original_content)
+
+def test_generated_store_read_day_recovers_multiple_records(tmp_path):
+    vault = Vault(tmp_path)
+    store = GeneratedStore(vault)
+
+    records = [
+        make_record(content="Summary one"),
+        make_record(content="Summary two"),
+        make_record(content="Summary three"),
+    ]
+
+    store.append_many(records)
+
+    loaded = store.read_day(records[0].timestamp.date())
+
+    assert len(loaded) == 3
+    assert [record.content for record in loaded] == [
+        "Summary one",
+        "Summary two",
+        "Summary three",
+    ] 
