@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from obsidian_core import GeneratedRecord, Note, Vault
 
@@ -16,7 +16,7 @@ def make_record(**kwargs):
             7,
             19,
             30,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         ),
         "generator": "daily-summary",
         "generator_version": "1",
@@ -84,24 +84,13 @@ def test_append_generated_preserves_generated_history(tmp_path):
 def test_append_generated_preserves_frontmatter(tmp_path):
     note = make_note(tmp_path)
 
-    note.write(
-        "---\n"
-        "title: Test\n"
-        "type: note\n"
-        "---\n\n"
-        "# Human Content\n"
-    )
+    note.write("---\ntitle: Test\ntype: note\n---\n\n# Human Content\n")
 
     note.append_generated(make_record())
 
     content = note.read()
 
-    assert content.startswith(
-        "---\n"
-        "title: Test\n"
-        "type: note\n"
-        "---\n"
-    )
+    assert content.startswith("---\ntitle: Test\ntype: note\n---\n")
     assert "# Human Content" in content
     assert "Generated summary" in content
 

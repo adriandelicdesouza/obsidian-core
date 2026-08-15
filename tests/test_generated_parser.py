@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -13,7 +13,7 @@ def make_record(**kwargs):
             7,
             19,
             30,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         ),
         "generator": "daily-summary",
         "generator_version": "1",
@@ -197,6 +197,7 @@ def test_generated_parser_rejects_malformed_timestamp(tmp_path):
     ):
         GeneratedParser.parse(modified)
 
+
 def test_generated_parser_rejects_malformed_header(tmp_path):
     record = make_record()
 
@@ -209,6 +210,7 @@ def test_generated_parser_rejects_malformed_header(tmp_path):
 
     with pytest.raises(ValueError):
         GeneratedParser.parse(modified)
+
 
 def test_generated_parser_rejects_missing_source_section(tmp_path):
     record = make_record()
@@ -260,6 +262,7 @@ def test_generated_parser_rejects_missing_content_section(tmp_path):
     ):
         GeneratedParser.parse(modified)
 
+
 def test_generated_parser_rejects_malformed_generated_id(tmp_path):
     record = make_record()
 
@@ -275,6 +278,7 @@ def test_generated_parser_rejects_malformed_generated_id(tmp_path):
         match="integrity check failed",
     ):
         GeneratedParser.parse(modified)
+
 
 def test_generated_parser_rejects_missing_generator_version(tmp_path):
     record = make_record()
@@ -292,6 +296,7 @@ def test_generated_parser_rejects_missing_generator_version(tmp_path):
     ):
         GeneratedParser.parse(modified)
 
+
 def test_generated_parser_rejects_malformed_source_records(tmp_path):
     record = make_record()
 
@@ -307,4 +312,3 @@ def test_generated_parser_rejects_malformed_source_records(tmp_path):
         match="Malformed source records section",
     ):
         GeneratedParser.parse(modified)
-

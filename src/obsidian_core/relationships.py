@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from .links import WikiLink
 from .links import WikiLink, parse_wiki_links
+
 
 @dataclass(frozen=True)
 class Relationship:

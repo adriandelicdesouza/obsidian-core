@@ -68,28 +68,18 @@ class GeneratedStore:
         return GeneratedParser.parse(note.read())
 
     def _render_daily_file(self, record: GeneratedRecord) -> str:
-        return (
-            "---\n"
-            "type: generated-log\n"
-            f"date: {record.timestamp.date()}\n"
-            "---\n\n"
-            + self._render(record)
+        return f"---\ntype: generated-log\ndate: {record.timestamp.date()}\n---\n\n" + self._render(
+            record
         )
 
     @staticmethod
     def _render(record: GeneratedRecord) -> str:
-        source_ids = "\n".join(
-            f"- `{source_id}`"
-            for source_id in record.source_ids
-        )
+        source_ids = "\n".join(f"- `{source_id}`" for source_id in record.source_ids)
 
         if not source_ids:
             source_ids = "_None_"
 
-        metadata = "\n".join(
-            f"- **{key}:** `{value}`"
-            for key, value in record.metadata.items()
-        )
+        metadata = "\n".join(f"- **{key}:** `{value}`" for key, value in record.metadata.items())
 
         if not metadata:
             metadata = "_None_"

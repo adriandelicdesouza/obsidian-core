@@ -19,42 +19,30 @@ def generation_chain(
         return []
 
     current = next(
-        (
-            record
-            for record in records
-            if record.previous_generated_id is None
-        ),
+        (record for record in records if record.previous_generated_id is None),
         None,
     )
 
     if current is None:
-        raise ValueError(
-            "Generation chain must have a starting record"
-        )
+        raise ValueError("Generation chain must have a starting record")
 
     chain = [current]
 
     while True:
         successors = [
-            record
-            for record in records
-            if record.previous_generated_id == current.generated_id
+            record for record in records if record.previous_generated_id == current.generated_id
         ]
 
         if not successors:
             break
 
         if len(successors) > 1:
-            raise ValueError(
-                "Generation chain has multiple successors"
-            )
+            raise ValueError("Generation chain has multiple successors")
 
         current = successors[0]
         chain.append(current)
 
     if len(chain) != len(records):
-        raise ValueError(
-            "Records do not form a single generation chain"
-        )
+        raise ValueError("Records do not form a single generation chain")
 
     return chain

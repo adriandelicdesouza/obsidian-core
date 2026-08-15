@@ -1,5 +1,7 @@
-from obsidian_core.frontmatter import Frontmatter
 import pytest
+
+from obsidian_core.frontmatter import Frontmatter
+
 
 def test_parse_properties():
     content = """---
@@ -55,10 +57,12 @@ def test_modify_property():
 
 
 def test_delete_property():
-    frontmatter = Frontmatter({
-        "title": "Test",
-        "draft": True,
-    })
+    frontmatter = Frontmatter(
+        {
+            "title": "Test",
+            "draft": True,
+        }
+    )
 
     frontmatter.delete("draft")
 
@@ -67,11 +71,13 @@ def test_delete_property():
 
 
 def test_serialize_properties():
-    frontmatter = Frontmatter({
-        "title": "Test",
-        "count": 42,
-        "tags": ["one", "two"],
-    })
+    frontmatter = Frontmatter(
+        {
+            "title": "Test",
+            "count": 42,
+            "tags": ["one", "two"],
+        }
+    )
 
     result = frontmatter.to_yaml()
 

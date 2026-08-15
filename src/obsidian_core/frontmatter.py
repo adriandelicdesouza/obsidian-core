@@ -3,6 +3,7 @@ from typing import Any
 
 import yaml
 
+
 class _UniqueKeyLoader(yaml.SafeLoader):
     """YAML loader that rejects duplicate mapping keys."""
 
@@ -14,9 +15,7 @@ def _construct_mapping(loader, node, deep=False):
         key = loader.construct_object(key_node, deep=deep)
 
         if key in mapping:
-            raise ValueError(
-                f"Duplicate frontmatter property: {key}"
-            )
+            raise ValueError(f"Duplicate frontmatter property: {key}")
 
         mapping[key] = loader.construct_object(
             value_node,
@@ -30,6 +29,7 @@ _UniqueKeyLoader.add_constructor(
     yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
     _construct_mapping,
 )
+
 
 @dataclass
 class Frontmatter:
@@ -75,9 +75,7 @@ class Frontmatter:
             return cls({})
 
         if not isinstance(data, dict):
-            raise ValueError(
-                "Obsidian frontmatter must contain a mapping"
-            )
+            raise ValueError("Obsidian frontmatter must contain a mapping")
 
         return cls(data)
 

@@ -140,6 +140,6 @@ def _replace_frontmatter(content: str, frontmatter: Frontmatter) -> str:
     if closing_index is None:
         return frontmatter.to_yaml() + content
 
-    body = "".join(lines[closing_index + 1:])
+    body = "".join(lines[closing_index + 1 :])
 
     return frontmatter.to_yaml() + body

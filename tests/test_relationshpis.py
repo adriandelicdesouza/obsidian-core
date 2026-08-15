@@ -92,7 +92,10 @@ def test_relationship_preserves_provenance():
 
 
 def test_extract_relationships_without_links():
-    assert extract_relationships(
-        "Home",
-        "# Home\n\nNo links here.",
-    ) == []
+    assert (
+        extract_relationships(
+            "Home",
+            "# Home\n\nNo links here.",
+        )
+        == []
+    )

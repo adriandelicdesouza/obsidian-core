@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -14,7 +14,7 @@ def test_create_raw_record():
         42,
         31,
         123000,
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
 
     record = RawRecord(
@@ -44,7 +44,7 @@ def test_create_raw_record():
 
 def test_raw_record_is_immutable():
     record = RawRecord(
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(UTC),
         source="test",
         event_type="event",
     )
@@ -56,7 +56,7 @@ def test_raw_record_is_immutable():
 def test_source_cannot_be_empty():
     with pytest.raises(ValueError):
         RawRecord(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             source="",
             event_type="event",
         )
@@ -65,7 +65,7 @@ def test_source_cannot_be_empty():
 def test_event_type_cannot_be_empty():
     with pytest.raises(ValueError):
         RawRecord(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             source="test",
             event_type="",
         )
@@ -80,7 +80,7 @@ def test_record_id():
         42,
         31,
         123000,
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
 
     record = RawRecord(
@@ -92,6 +92,7 @@ def test_record_id():
     assert len(record.record_id) == 16
     assert record.record_id.isalnum()
 
+
 def test_record_id_is_deterministic():
     timestamp = datetime(
         2026,
@@ -101,7 +102,7 @@ def test_record_id_is_deterministic():
         42,
         31,
         123000,
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
 
     first = RawRecord(
@@ -124,6 +125,7 @@ def test_record_id_is_deterministic():
 
     assert first.record_id == second.record_id
 
+
 def test_record_id_changes_when_content_changes():
     timestamp = datetime(
         2026,
@@ -133,7 +135,7 @@ def test_record_id_changes_when_content_changes():
         42,
         31,
         123000,
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
 
     first = RawRecord(
@@ -152,6 +154,7 @@ def test_record_id_changes_when_content_changes():
 
     assert first.record_id != second.record_id
 
+
 def test_timestamp_must_be_timezone_aware():
     with pytest.raises(ValueError, match="timezone-aware"):
         RawRecord(
@@ -159,4 +162,3 @@ def test_timestamp_must_be_timezone_aware():
             source="test",
             event_type="event",
         )
-

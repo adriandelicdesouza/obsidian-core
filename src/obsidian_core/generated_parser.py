@@ -1,5 +1,6 @@
-from datetime import datetime
 import re
+from datetime import datetime
+
 import yaml
 
 from .generated import GeneratedRecord
@@ -25,11 +26,7 @@ class GeneratedParser:
 
         for index, match in enumerate(matches):
             start = match.start()
-            end = (
-                matches[index + 1].start()
-                if index + 1 < len(matches)
-                else len(content)
-            )
+            end = matches[index + 1].start() if index + 1 < len(matches) else len(content)
 
             block = content[start:end]
 
@@ -50,9 +47,7 @@ class GeneratedParser:
         if not match:
             raise ValueError("Invalid generated record header")
 
-        timestamp = datetime.fromisoformat(
-            match.group("timestamp")
-        )
+        timestamp = datetime.fromisoformat(match.group("timestamp"))
 
         generator = match.group("generator")
 
@@ -98,15 +93,11 @@ class GeneratedParser:
                 parts = line.split("`", 2)
 
                 if len(parts) != 3:
-                    raise ValueError(
-                        f"Invalid generated record field: {prefix}"
-                    )
+                    raise ValueError(f"Invalid generated record field: {prefix}")
 
                 return parts[1]
 
-        raise ValueError(
-            f"Generated record field not found: {prefix}"
-        )
+        raise ValueError(f"Generated record field not found: {prefix}")
 
     @staticmethod
     def _parse_source_ids(lines: list[str]) -> list[str]:
@@ -155,9 +146,7 @@ class GeneratedParser:
                 return {}
 
             if not line.startswith("- **") or ":**" not in line:
-                raise ValueError(
-                    "Generated record integrity check failed: malformed metadata"
-                )
+                raise ValueError("Generated record integrity check failed: malformed metadata")
 
             key, value = line[4:].split(":**", 1)
             value = value.strip().strip("`")

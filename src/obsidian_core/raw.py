@@ -44,8 +44,6 @@ class RawRecord:
             default=str,
         )
 
-        digest = hashlib.sha256(
-            canonical.encode("utf-8")
-        ).hexdigest()
+        digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
         return digest[:16]

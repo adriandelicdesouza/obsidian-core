@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from obsidian_core import GeneratedRecord, GeneratedStore, Vault
@@ -12,7 +12,7 @@ def make_record(**kwargs):
             7,
             19,
             30,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         ),
         "generator": "daily-summary",
         "generator_version": "1",
@@ -28,6 +28,7 @@ def make_record(**kwargs):
     values.update(kwargs)
 
     return GeneratedRecord(**values)
+
 
 def test_generated_store_append_many_same_day(tmp_path):
     vault = Vault(tmp_path)
@@ -50,6 +51,7 @@ def test_generated_store_append_many_same_day(tmp_path):
     assert "Summary two" in content
     assert "Summary three" in content
 
+
 def test_generated_store_append_many_different_days(tmp_path):
     vault = Vault(tmp_path)
     store = GeneratedStore(vault)
@@ -61,7 +63,7 @@ def test_generated_store_append_many_different_days(tmp_path):
             7,
             19,
             30,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         )
     )
 
@@ -72,7 +74,7 @@ def test_generated_store_append_many_different_days(tmp_path):
             8,
             19,
             30,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         )
     )
 
@@ -81,13 +83,10 @@ def test_generated_store_append_many_different_days(tmp_path):
     assert len(paths) == 2
     assert paths[0] != paths[1]
 
-    assert paths[0] == (
-        tmp_path / "Generated" / "2026" / "08" / "07.md"
-    )
+    assert paths[0] == (tmp_path / "Generated" / "2026" / "08" / "07.md")
 
-    assert paths[1] == (
-        tmp_path / "Generated" / "2026" / "08" / "08.md"
-    )
+    assert paths[1] == (tmp_path / "Generated" / "2026" / "08" / "08.md")
+
 
 def test_generated_store_writes_record(tmp_path):
     vault = Vault(tmp_path)
@@ -140,6 +139,7 @@ def test_generated_store_can_read_records(tmp_path):
     assert records[0].generator_version == record.generator_version
     assert records[0].content == record.content
     assert records[0].source_ids == record.source_ids
+
 
 def test_generated_store_is_append_only(tmp_path):
     vault = Vault(tmp_path)

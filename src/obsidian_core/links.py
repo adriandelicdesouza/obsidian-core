@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
@@ -17,9 +17,7 @@ class WikiLink:
         return f"[[{self.target}|{self.display}]]"
 
 
-WIKI_LINK_PATTERN = re.compile(
-    r"\[\[([^|\]]+)(?:\|([^\]]+))?\]\]"
-)
+WIKI_LINK_PATTERN = re.compile(r"\[\[([^|\]]+)(?:\|([^\]]+))?\]\]")
 
 
 def parse_wiki_links(content: str) -> list[WikiLink]:
