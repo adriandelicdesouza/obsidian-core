@@ -15,6 +15,7 @@ class GeneratedRecord:
 
     source_ids: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
+    previous_generated_id: str | None = None
 
     def __post_init__(self) -> None:
         """Validate generated record invariants."""
@@ -32,6 +33,11 @@ class GeneratedRecord:
         if not self.generator_version:
             raise ValueError(
                 "GeneratedRecord generator version cannot be empty"
+            )
+
+        if self.previous_generated_id == "":
+            raise ValueError(
+                "Previous generated ID cannot be empty"
             )
 
     @property
