@@ -76,7 +76,7 @@ def test_date_property():
 
 
 def test_datetime_property():
-    value = datetime(2026, 8, 7, 15, 30, 0)
+    value = datetime(2026, 8, 7, 15, 30, 0)  # noqa: DTZ001
 
     frontmatter = Frontmatter(
         {

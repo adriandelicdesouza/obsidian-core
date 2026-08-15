@@ -66,7 +66,7 @@ def test_generated_record_requires_timezone_aware_timestamp():
 
     try:
         GeneratedRecord(
-            timestamp=datetime(2026, 8, 7, 19, 30),
+            timestamp=datetime(2026, 8, 7, 19, 30),  # noqa: DTZ001
             generator="daily-summary",
             generator_version="1",
             content="Summary",

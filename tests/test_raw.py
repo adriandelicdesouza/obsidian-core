@@ -158,7 +158,7 @@ def test_record_id_changes_when_content_changes():
 def test_timestamp_must_be_timezone_aware():
     with pytest.raises(ValueError, match="timezone-aware"):
         RawRecord(
-            timestamp=datetime(2026, 8, 7, 18, 42, 31),
+            timestamp=datetime(2026, 8, 7, 18, 42, 31),  # noqa: DTZ001
             source="test",
             event_type="event",
         )

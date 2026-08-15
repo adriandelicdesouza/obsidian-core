@@ -75,7 +75,7 @@ class Frontmatter:
             return cls({})
 
         if not isinstance(data, dict):
-            raise ValueError("Obsidian frontmatter must contain a mapping")
+            raise TypeError("Obsidian frontmatter must contain a mapping")
 
         return cls(data)
 

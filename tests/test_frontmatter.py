@@ -119,7 +119,7 @@ def test_non_dictionary_yaml():
 """
 
     with pytest.raises(
-        ValueError,
+        TypeError,
         match="must contain a mapping",
     ):
         Frontmatter.parse(content)
