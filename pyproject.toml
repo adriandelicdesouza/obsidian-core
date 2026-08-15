@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "obsidian-core"
-version = "0.1.0"
+version = "0.3.0"
 description = "A lightweight Python library for interacting with Obsidian vaults."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
 authors = [
-    { name = "Adrian" }
+    { name = "bonk" }
 ]
 dependencies = [
     "PyYAML>=6.0"
