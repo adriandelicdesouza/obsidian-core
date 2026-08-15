@@ -41,6 +41,83 @@ Obsidian Desktop
 
 The vault remains the storage and presentation layer while automation services interact with it through `obsidian-core`.
 
+## Data pipeline
+
+The project separates authoritative raw observations from derived information.
+
+    RawRecord
+        │
+        ▼
+    RawStore
+        │
+        ▼
+    RawParser
+        │
+        ▼
+    Analysis / Generator
+        │
+        ▼
+    GeneratedRecord
+        │
+        ▼
+    GeneratedStore
+        │
+        ▼
+    Obsidian
+
+### Raw data
+
+`RawRecord` represents an original observation produced by a machine, service, or other external source.
+
+`RawStore` persists raw records as append-only daily logs in the vault. Raw records are the authoritative representation of the underlying observation. The stored record includes its source, timestamp, event type, identifiers, metadata, payload, and deterministic record ID.
+
+`RawParser` reads stored raw logs back into `RawRecord` objects. During parsing, it reconstructs each record and verifies its stored record ID against the calculated value. A mismatch causes parsing to fail, providing an integrity check for stored raw data.
+
+Raw data should not be silently rewritten or replaced by analysis results.
+
+### Analysis and generation
+
+Analysis and generator components operate on raw or parsed data to produce derived information.
+
+The analysis layer is intentionally separate from raw storage. It may interpret, summarize, classify, or otherwise transform observations, but it does not become authoritative merely because it produces a conclusion.
+
+### Generated data
+
+`GeneratedRecord` represents derived information produced by an analysis or generator.
+
+Generated records retain provenance through:
+
+- timestamp
+- generator identity
+- generator version
+- source record IDs
+- metadata
+- generated content
+- optional reference to a previous generated record
+
+This allows generated output to be associated with the raw observations from which it was derived and allows generated history to evolve without losing previous results.
+
+`GeneratedStore` persists generated records as append-only daily logs. Generated records are derived data and do not replace the authoritative raw records.
+
+### Obsidian
+
+Obsidian acts as the filesystem-backed storage and presentation layer.
+
+Raw and generated records are stored as Markdown files within the vault. Human-readable notes can coexist with generated information, while the raw and generated stores maintain their respective data boundaries.
+
+The intended flow is therefore:
+
+1. An external source produces an observation.
+2. The observation is represented as a `RawRecord`.
+3. `RawStore` persists the original observation.
+4. `RawParser` reconstructs and validates stored raw records.
+5. An analysis or generator derives new information.
+6. The result is represented as a `GeneratedRecord`.
+7. `GeneratedStore` persists the derived result and its provenance.
+8. Obsidian provides the human-readable vault representation.
+
+The key distinction is **authority versus derivation**: raw observations are authoritative, while generated information is derived and must retain enough provenance to trace it back to its sources.
+
 ## Design principles
 
 ### Human knowledge is protected
