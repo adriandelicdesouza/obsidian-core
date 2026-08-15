@@ -6,7 +6,6 @@ from .raw_parser import RawParser
 from .generated import GeneratedRecord
 from .generated_store import GeneratedStore
 from .generated_parser import GeneratedParser
-from .links import WikiLink, parse_wiki_links
 from .links import WikiLink, create_wiki_link, parse_wiki_links
 from .relationships import Relationship, extract_relationships
 from .versioning import generation_chain, is_successor
@@ -20,8 +19,6 @@ __all__ = [
     "GeneratedRecord",
     "GeneratedStore",
     "GeneratedParser",
-    "WikiLink",
-    "parse_wiki_links",
     "WikiLink",
     "create_wiki_link",
     "parse_wiki_links",
