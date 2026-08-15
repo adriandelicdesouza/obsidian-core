@@ -284,3 +284,30 @@ def test_day_path_uses_date(tmp_path):
     )
 
     assert path == (Path("Raw") / "esp32-sniffer" / "2026" / "08" / "07.md")
+
+def test_read_day_round_trip_mixed_identifier_types(tmp_path):
+    vault = Vault(tmp_path)
+    store = RawStore(vault)
+
+    record = make_record(
+        identifiers={
+            "channel": 6,
+            "hidden": True,
+            "tags": ["wifi", "probe", "2.4ghz"],
+            "nested": {
+                "vendor": "test",
+                "capabilities": ["802.11n", "802.11ac"],
+            },
+        }
+    )
+
+    store.append(record)
+
+    loaded = store.read_day(
+        source="esp32-sniffer",
+        timestamp=date(2026, 8, 7),
+    )
+
+    assert len(loaded) == 1
+    assert loaded[0].record_id == record.record_id
+    assert loaded[0].identifiers == record.identifiers

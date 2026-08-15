@@ -1,3 +1,4 @@
+import json
 from datetime import date, datetime
 from pathlib import Path
 
@@ -94,7 +95,10 @@ class RawStore:
         if not mapping:
             return "_None_"
 
-        return "\n".join(f"- **{key}:** `{value}`" for key, value in mapping.items())
+        return "\n".join(
+            f"- **{key}:** `{json.dumps(value, ensure_ascii=False, sort_keys=True)}`"
+            for key, value in mapping.items()
+        )
 
     @staticmethod
     def _render_payload(payload) -> str:

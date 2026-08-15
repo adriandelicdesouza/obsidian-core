@@ -2,8 +2,6 @@ import json
 import re
 from datetime import datetime
 
-import yaml
-
 from .raw import RawRecord
 
 
@@ -127,7 +125,7 @@ class RawParser:
 
                 value = value.strip().strip("`")
 
-                values[key] = yaml.safe_load(value)
+                values[key] = json.loads(value)
 
         return values
 
