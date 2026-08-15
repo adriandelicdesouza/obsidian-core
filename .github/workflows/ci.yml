@@ -25,5 +25,5 @@ jobs:
       - name: Run Ruff
         run: ruff check .
 
-      - name: Run tests
-        run: pytest -q
+      - name: Run tests with coverage
+        run: pytest --cov=obsidian_core --cov-report=term-missing
