@@ -16,6 +16,24 @@ EXPECTED_PUBLIC_API = {
     "extract_relationships",
     "generation_chain",
     "is_successor",
+    # v0.4 ingestion protocol
+    "SCHEMA_VERSION",
+    "EventSchemaError",
+    "event_key",
+    "Ingestor",
+    "IngestResult",
+    "IngestStatus",
+    "Collector",
+    "Observation",
+    "Provenance",
+    "InvalidCursor",
+    "Checkpoint",
+    "CheckpointStatus",
+    "CheckpointStore",
+    "RunReport",
+    "run_collector",
+    "ReconciliationReport",
+    "reconcile",
 }
 
 
