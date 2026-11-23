@@ -311,3 +311,27 @@ def test_read_day_round_trip_mixed_identifier_types(tmp_path):
     assert len(loaded) == 1
     assert loaded[0].record_id == record.record_id
     assert loaded[0].identifiers == record.identifiers
+
+def test_day_path_accepts_datetime_and_ignores_time(tmp_path):
+    from datetime import UTC, datetime, timedelta, timezone
+
+    store = RawStore(Vault(tmp_path))
+
+    for ts in (
+        datetime(2026, 8, 7, 0, 0, 1, tzinfo=UTC),
+        datetime(2026, 8, 7, 23, 59, 59, tzinfo=timezone(timedelta(hours=-5))),
+    ):
+        assert store.day_path("esp32-sniffer", ts) == store.day_path(
+            "esp32-sniffer", date(2026, 8, 7)
+        )
+
+
+def test_day_path_annotation_is_date():
+    import inspect
+    import typing
+
+    from obsidian_core.raw_store import RawStore as Store
+
+    hints = typing.get_type_hints(Store.day_path)
+    assert hints["timestamp"] is date
+    assert list(inspect.signature(Store.day_path).parameters) == ["self", "source", "timestamp"]

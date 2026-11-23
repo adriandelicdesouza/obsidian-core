@@ -1,5 +1,5 @@
 import json
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 
 from .raw import RawRecord
@@ -80,8 +80,13 @@ class RawStore:
 
         return RawParser.parse(note.read())
 
-    def day_path(self, source: str, timestamp: datetime) -> Path:
-        """Return the raw log path for a source and timestamp."""
+    def day_path(self, source: str, timestamp: date) -> Path:
+        """Return the raw log path for a source and calendar day.
+
+        ``timestamp`` is a :class:`datetime.date`. A :class:`datetime.datetime`
+        is also accepted (it is a ``date`` subclass); only its year, month and
+        day are used, so the time of day never changes the path.
+        """
         return (
             self.root
             / source
