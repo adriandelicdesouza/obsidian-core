@@ -5,6 +5,7 @@ protocols (:mod:`obsidian_core.collectors`, :mod:`obsidian_core.ingestion`,
 :mod:`obsidian_core.checkpoints`) and is never imported by them.
 """
 
+from .activity import GitActivityNotes
 from .collector import GitCollector, GitError
 
-__all__ = ["GitCollector", "GitError"]
+__all__ = ["GitActivityNotes", "GitCollector", "GitError"]
