@@ -118,6 +118,48 @@ The intended flow is therefore:
 
 The key distinction is **authority versus derivation**: raw observations are authoritative, while generated information is derived and must retain enough provenance to trace it back to its sources.
 
+## Ingestion (v0.4)
+
+Collectors feed the raw archive through an idempotent boundary, so
+observations can be replayed safely after crashes, lost checkpoints or
+restores:
+
+    Collector ──▶ stamp (schema version + provenance) ──▶ Ingestor ──▶ RawStore
+                       CheckpointStore ◀── run_collector        reconcile ──┘
+
+* **append-only ≠ idempotent.** `RawStore` still appends whatever it is given;
+  `Ingestor` looks each event key up in the archive and reports `NEW`,
+  `KNOWN` or `CONFLICT`, writing only `NEW` events.
+* **checkpoint ≠ authoritative history.** `CheckpointStore` keeps one cursor per
+  collector to skip work. Missing or corrupt checkpoints mean a full, safe
+  replay; `reconcile()` finds and appends gaps a checkpoint would hide.
+* **Event identity** (`event_key`, full SHA-256 over source, event type, UTC
+  timestamp and identifiers) is separate from `RawRecord.record_id`, which is
+  unchanged and stays the per-record integrity check.
+* **Git** is one adapter (`obsidian_core.git.GitCollector`), and
+  `GitActivityNotes` writes daily activity notes that link the daily note, the
+  raw log and each repository.
+
+```python
+from datetime import date
+
+from obsidian_core import CheckpointStore, Ingestor, RawStore, Vault, run_collector
+from obsidian_core.git import GitActivityNotes, GitCollector
+
+vault = Vault("~/Documents/Obsidian/Knowledge Base")
+store = RawStore(vault)
+report = run_collector(
+    GitCollector("~/obsidian-core"),
+    Ingestor(store),
+    CheckpointStore("~/.local/state/obsidian-core/checkpoints"),
+)
+GitActivityNotes(vault, store).write(date.today())
+```
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the schema and versioning
+policy, identity decision, checkpoint and reconciliation semantics, and the
+public API boundaries.
+
 ## Design principles
 
 ### Human knowledge is protected
@@ -254,7 +296,7 @@ The integration does not need to know how the Markdown file is structured intern
 
 ## Roadmap
 
-The following capabilities are planned and are not currently part of the `0.1.0` API:
+The following capabilities are planned and are not currently part of the `0.4.0` API:
 
 * Full-text search
 * Indexing
@@ -281,7 +323,13 @@ obsidian-core/
 │       ├── raw_store.py
 │       ├── relationships.py
 │       ├── versioning.py
-│       └── exceptions.py
+│       ├── exceptions.py
+│       ├── events.py            # raw-event envelope, schema version, event identity
+│       ├── ingestion.py         # idempotent Ingestor
+│       ├── collectors.py        # Collector protocol, Provenance
+│       ├── checkpoints.py       # CheckpointStore, run_collector
+│       ├── reconciliation.py    # reconcile()
+│       └── git/                 # Git adapter: GitCollector, GitActivityNotes
 ├── tests/
 ├── docs/
 ├── pyproject.toml
@@ -324,8 +372,8 @@ ruff check .
 
 ## Status
 
-**Version 0.1.0 — Early development**
+**Version 0.4.0 — Early development**
 
-The current release provides the core vault, note, frontmatter, link, raw data, generated content, relationship, and versioning APIs described above.
+The current release provides the core vault, note, frontmatter, link, raw data, generated content, relationship, and versioning APIs described above, plus the v0.4 ingestion protocol (collectors, idempotent ingestion, checkpoints, reconciliation) and the Git adapter.
 
 The API is intentionally expected to change while the underlying architecture is established. Roadmap items are not considered part of the current stable API.
