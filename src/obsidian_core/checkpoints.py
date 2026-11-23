@@ -69,7 +69,7 @@ class CheckpointStore:
     """Persist one checkpoint file per collector in a directory."""
 
     def __init__(self, directory: str | Path):
-        self.directory = Path(directory)
+        self.directory = Path(directory).expanduser()
 
     def path_for(self, collector: str) -> Path:
         if not collector:
